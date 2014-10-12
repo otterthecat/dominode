@@ -27,9 +27,11 @@ dominode.generate({
 });
 
 dominode.prepend('test', document.querySelector('body'));
-dominode.getElement('test').fetch({
-	url: '/github/dominode/public/',
-	data: JSON.stringify({
-		"foo" : "bar"
-	});
+dominode.getElement('test').fetch('/github/dominode/public/javascript/data.json')
+.then(function(response){
+	console.log('pass', response);
+}, function(reject){
+	console.log('fail', reject);
+}).catch(function (err){
+	console.log('caught', err);
 });
