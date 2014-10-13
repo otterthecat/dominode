@@ -1,5 +1,6 @@
 // Gulp
 var gulp = require('gulp');
+var uglify = require('gulp-uglify');
 
 // Tools
 var complexity = require('gulp-complexity');
@@ -133,6 +134,12 @@ gulp.task('coverage', function (cb) {
 		});
 });
 
+gulp.task('compress', function() {
+  gulp.src('public/javascript/app.js')
+    .pipe(uglify())
+    .pipe(gulp.dest('public/javascript/dist'))
+});
+
 gulp.task('watch', function () {
 	'use strict';
 	gulp.watch(sources, ['format', 'lint', 'test']);
@@ -141,3 +148,4 @@ gulp.task('watch', function () {
 // Grouped Tasks
 gulp.task('default', ['watch', 'format', 'lint', 'complexity', 'test']);
 gulp.task('report', ['plato', 'coverage']);
+gulp.task('dist', ['compress']);
