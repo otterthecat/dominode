@@ -1,12 +1,3 @@
-[
-	{
-		"item1": {
-			"title": "Foo"
-		},
-	},
-	{
-		"item2":{
-			"title": "Bar"
-		}
-	}
-]
+{
+	"content": "<h1>Foobar Rubarb</h1>"
+}
