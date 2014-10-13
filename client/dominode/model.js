@@ -3,6 +3,8 @@ var events = require('events');
 var ajax = require('../helpers/ajax');
 
 var Model = function (obj) {
+	'use strict';
+
 	events.EventEmitter.call(this);
 	this.data = obj;
 };
@@ -10,8 +12,11 @@ var Model = function (obj) {
 util.inherits(Model, events.EventEmitter);
 
 Model.prototype.fetch = function (url) {
+	'use strict';
+
 	var self = this;
-	var promise = ajax.makePromise(url).then(function (resolve) {
+	var modelUrl = url || self.data.url;
+	var promise = ajax.makePromise(modelUrl).then(function (resolve) {
 		self.update(resolve);
 		return resolve;
 	},
@@ -22,10 +27,12 @@ Model.prototype.fetch = function (url) {
 };
 
 Model.prototype.update = function (data) {
+	'use strict';
+
 	var parsedData = JSON.parse(data);
 	for(var item in parsedData) {
 		this.data[item] = parsedData[item];
-	};
+	}
 
 	this.emit('updated', this);
 };

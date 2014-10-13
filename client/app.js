@@ -3,7 +3,7 @@ var View = require('./dominode/view');
 var schema = require('./schemas/headline');
 
 var view = new View();
-var foo = new Model(schema);
+var headline = new Model(schema);
 
-view.generate(foo)
-	.prepend('test', document.querySelector('body'));
+view.generate(headline)
+	.prepend('headline', document.querySelector('body'));

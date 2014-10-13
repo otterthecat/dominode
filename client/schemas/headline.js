@@ -1,15 +1,17 @@
 module.exports = {
-	name: 'test',
-	element: 'div',
-	attributes: {
-		'class': 'testing',
-		'data-bind': 'other'
+	name : 'headline',
+	element : 'div',
+	attributes : {
+		'class' : 'testing',
+		'data-bind' : 'other'
 	},
-	content: '<h1>Hello World</h1>',
-	event: 'click',
+	content : '<h1>Hello World</h1>',
+	url : '/github/dominode/public/javascript/data.json',
+	event : 'click',
 	// callback takes (event, scope)
-	// 'this' is bound to element
-	callback: function (ev, scope){
-		this.fetch('/github/dominode/public/javascript/data.json');
+	// 'this' is bound to model
+	callback : function () {
+		'use strict';
+		this.fetch();
 	}
-}
+};
