@@ -135,9 +135,11 @@ gulp.task('coverage', function (cb) {
 });
 
 gulp.task('compress', function() {
-  gulp.src('public/javascript/app.js')
-    .pipe(uglify())
-    .pipe(gulp.dest('public/javascript/dist'))
+	'use strict';
+
+	gulp.src('public/javascript/app.js')
+	.pipe(uglify())
+	.pipe(gulp.dest('public/javascript/dist'));
 });
 
 gulp.task('watch', function () {

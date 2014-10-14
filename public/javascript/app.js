@@ -1,15 +1,18 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/home/d/projects/github/dominode/client/app.js":[function(require,module,exports){
 var Model = require('./dominode/model');
 var View = require('./dominode/view');
-var schema = require('./schemas/headline');
+var headlineSchema = require('./schemas/headline');
+var footerSchema = require('./schemas/footer');
 
 var view = new View();
-var headline = new Model(schema);
+var headline = new Model(headlineSchema);
+var footer = new Model(footerSchema);
 
-view.generate(headline)
-	.prepend('headline', document.querySelector('body'));
+view.generate([headline, footer])
+	.prepend('headline', document.querySelector('body'))
+	.append('footer');
 
-},{"./dominode/model":"/home/d/projects/github/dominode/client/dominode/model.js","./dominode/view":"/home/d/projects/github/dominode/client/dominode/view.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/model.js":[function(require,module,exports){
+},{"./dominode/model":"/home/d/projects/github/dominode/client/dominode/model.js","./dominode/view":"/home/d/projects/github/dominode/client/dominode/view.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/model.js":[function(require,module,exports){
 var util = require('util');
 var events = require('events');
 var ajax = require('../helpers/ajax');
@@ -69,52 +72,68 @@ var View = function () {
 	this.elements = {};
 };
 
-View.prototype = {
-	generate : function (model) {
-		'use strict';
+var buildModelView = function (model) {
+	var self = this;
+	var obj = model.data || model;
+	var element = document.createElement(obj.element);
+	if(obj.attributes) {
+		applyAttributes(element, obj.attributes);
+	}
 
-		var obj = model.data || model;
-		var self = this;
-		var element = document.createElement(obj.element);
-		if(obj.attributes) {
-			applyAttributes(element, obj.attributes);
-		}
-
-		element.innerHTML = obj.content;
+	element.innerHTML = obj.content;
+	if(obj.event){
 		element.addEventListener(obj.event, function (ev) {
 			obj.callback.call(model, ev, self);
 		});
+	}
 
-		obj.element = element;
+	obj.element = element;
 
-		this.elements[obj.name] = obj;
+	self.elements[obj.name] = obj;
 
-		model.on('updated', function () {
-			self.refresh(model.data.name);
-		});
+	model.on('updated', function () {
+		self.refresh(model.data.name);
+	});
+};
 
+View.prototype = {
+	generate : function (models) {
+		'use strict';
+
+		models.forEach(buildModelView.bind(this));
 		return this;
 	},
 
 	append : function (el, target) {
 		'use strict';
-		target.appendChild(this.getElement(el));
+
+		var targetNode = target || document.querySelector('body');
+		targetNode.appendChild(this.getElement(el).element);
+		return this;
 	},
 
 	prepend : function (el, target) {
 		'use strict';
-		target.insertBefore(this.getElement(el).element, target.firstChild);
+
+		var targetNode = target || document.querySelector('body');
+		targetNode.insertBefore(this.getElement(el).element, targetNode.firstChild);
+		return this;
 	},
 
 	refresh : function (el) {
 		'use strict';
 		var item = this.getElement(el);
 		item.element.innerHTML = item.content;
+		return this;
 	},
 
 	getElement : function (str) {
 		'use strict';
 		return this.elements[str];
+	},
+
+	listElements : function () {
+		return this.elements;
 	}
 };
 
@@ -151,6 +170,16 @@ exports.makePromise = function (url) {
 
 		request.send();
 	});
+};
+
+},{}],"/home/d/projects/github/dominode/client/schemas/footer.js":[function(require,module,exports){
+module.exports = {
+	name : 'footer',
+	element : 'div',
+	attributes : {
+		'class' : 'main-footer'
+	},
+	content : 'this is the footer'
 };
 
 },{}],"/home/d/projects/github/dominode/client/schemas/headline.js":[function(require,module,exports){
