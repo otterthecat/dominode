@@ -1,19 +1,23 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/home/d/projects/github/dominode/client/app.js":[function(require,module,exports){
-var Model = require('./dominode/model');
-var View = require('./dominode/view');
+// var Model = require('./dominode/model');
+// var View = require('./dominode/view');
+var page = require('./dominode/page');
 var headlineSchema = require('./schemas/headline');
 var footerSchema = require('./schemas/footer');
 
-var view = new View();
-var headline = new Model(headlineSchema);
-var footer = new Model(footerSchema);
+// var view = new View();
+// var headline = new Model(headlineSchema);
+// var footer = new Model(footerSchema);
 
-view.generate([headline, footer])
-	.prepend('headline', document.querySelector('body'))
-	.append('footer')
-	.bond(footer, headline); // footer takes on same events as headline. Triggers same callback (i.e update the headline)
+// view.generate([headline, footer])
+// 	.prepend('headline', document.querySelector('body'))
+// 	.append('footer')
+// 	.bond(footer, headline); // footer takes on same events as headline. Triggers same callback (i.e update the headline)
 
-},{"./dominode/model":"/home/d/projects/github/dominode/client/dominode/model.js","./dominode/view":"/home/d/projects/github/dominode/client/dominode/view.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/model.js":[function(require,module,exports){
+page.register([headlineSchema, footerSchema]);
+console.log('page', page);
+
+},{"./dominode/page":"/home/d/projects/github/dominode/client/dominode/page.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/model.js":[function(require,module,exports){
 var util = require('util');
 var events = require('events');
 var ajax = require('../helpers/ajax');
@@ -55,7 +59,89 @@ Model.prototype.update = function (data) {
 
 module.exports = Model;
 
-},{"../helpers/ajax":"/home/d/projects/github/dominode/client/helpers/ajax.js","events":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","util":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/util/util.js"}],"/home/d/projects/github/dominode/client/dominode/view.js":[function(require,module,exports){
+},{"../helpers/ajax":"/home/d/projects/github/dominode/client/helpers/ajax.js","events":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","util":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/util/util.js"}],"/home/d/projects/github/dominode/client/dominode/page.js":[function(require,module,exports){
+var Model = require('./model');
+var View = require('./view');
+
+var Page = function () {
+	'use strict';
+	this.elements = {};
+};
+
+var applyAttributes = function (el, obj) {
+	'use strict';
+
+	if(typeof obj !== 'undefined') {
+		for(var item in obj) {
+			el.setAttribute(item, obj[item]);
+		}
+	}
+
+	return el;
+};
+
+var buildViewModel = function (model) {
+	'use strict';
+
+	var self = this;
+	var obj = model.data || model;
+	var element = document.createElement(obj.element);
+	if(obj.attributes) {
+		applyAttributes(element, obj.attributes);
+	}
+
+	element.innerHTML = obj.content;
+	if(obj.event){
+		element.addEventListener(obj.event, function (ev) {
+			obj.callback.call(model, ev, self);
+		});
+	}
+
+	obj.element = element;
+
+	self.elements[obj.name] = obj;
+
+	model.on('updated', function () {
+		self.refresh(model.data.name);
+	});
+};
+
+Page.prototype.register = function (list) {
+	'use strict';
+
+	var self = this;
+	list.forEach(function (item) {
+		var model = new Model(item);
+		buildViewModel.call(self, model);
+	}.bind(self));
+
+	return self;
+};
+
+Page.prototype.redirect = function (str) {
+	'use strict';
+	window.location.href = str;
+};
+
+Page.prototype.getElement = function (str) {
+	'use strict';
+	return this.elements[str];
+};
+
+Page.prototype.destroy = function (str) {
+	'use strict';
+
+	var el = this.getElement(str).element;
+	el.parentNode.removeChild(el);
+	delete this.elements[str];
+	return this;
+}
+
+
+
+module.exports = new Page();
+
+},{"./model":"/home/d/projects/github/dominode/client/dominode/model.js","./view":"/home/d/projects/github/dominode/client/dominode/view.js"}],"/home/d/projects/github/dominode/client/dominode/view.js":[function(require,module,exports){
 var applyAttributes = function (el, obj) {
 	'use strict';
 
