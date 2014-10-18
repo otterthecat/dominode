@@ -80,6 +80,13 @@ View.prototype = {
 	listElements : function () {
 		'use strict';
 		return this.elements;
+	},
+
+	bond: function (base, target) {
+		var self = this;
+		base.data.element.addEventListener(target.data.event, function (ev) {
+			target.data.callback.call(target, ev, self);
+		});
 	}
 };
 

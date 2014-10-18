@@ -9,4 +9,5 @@ var footer = new Model(footerSchema);
 
 view.generate([headline, footer])
 	.prepend('headline', document.querySelector('body'))
-	.append('footer');
+	.append('footer')
+	.bond(footer, headline);

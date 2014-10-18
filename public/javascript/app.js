@@ -10,7 +10,8 @@ var footer = new Model(footerSchema);
 
 view.generate([headline, footer])
 	.prepend('headline', document.querySelector('body'))
-	.append('footer');
+	.append('footer')
+	.bond(footer, headline);
 
 },{"./dominode/model":"/home/d/projects/github/dominode/client/dominode/model.js","./dominode/view":"/home/d/projects/github/dominode/client/dominode/view.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/model.js":[function(require,module,exports){
 var util = require('util');
@@ -73,6 +74,8 @@ var View = function () {
 };
 
 var buildModelView = function (model) {
+	'use strict';
+
 	var self = this;
 	var obj = model.data || model;
 	var element = document.createElement(obj.element);
@@ -133,7 +136,15 @@ View.prototype = {
 	},
 
 	listElements : function () {
+		'use strict';
 		return this.elements;
+	},
+
+	bond: function (base, target) {
+		var self = this;
+		base.data.element.addEventListener(target.data.event, function (ev) {
+			target.data.callback.call(target, ev, self);
+		});
 	}
 };
 
