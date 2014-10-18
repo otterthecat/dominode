@@ -10,4 +10,4 @@ var footer = new Model(footerSchema);
 view.generate([headline, footer])
 	.prepend('headline', document.querySelector('body'))
 	.append('footer')
-	.bond(footer, headline);
+	.bond(footer, headline); // footer takes on same events as headline. Triggers same callback (i.e update the headline)

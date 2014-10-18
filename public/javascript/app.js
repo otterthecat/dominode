@@ -11,7 +11,7 @@ var footer = new Model(footerSchema);
 view.generate([headline, footer])
 	.prepend('headline', document.querySelector('body'))
 	.append('footer')
-	.bond(footer, headline);
+	.bond(footer, headline); // footer takes on same events as headline. Triggers same callback (i.e update the headline)
 
 },{"./dominode/model":"/home/d/projects/github/dominode/client/dominode/model.js","./dominode/view":"/home/d/projects/github/dominode/client/dominode/view.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/model.js":[function(require,module,exports){
 var util = require('util');
