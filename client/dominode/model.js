@@ -6,16 +6,22 @@ var Model = function (obj) {
 	'use strict';
 
 	events.EventEmitter.call(this);
-	this.data = obj;
+	this.scheme = obj;
 };
 
 util.inherits(Model, events.EventEmitter);
+
+Model.prototype.refresh = function () {
+		'use strict';
+		this.scheme.element.innerHTML = this.scheme.content;
+		return this;
+	},
 
 Model.prototype.fetch = function (url) {
 	'use strict';
 
 	var self = this;
-	var modelUrl = url || self.data.url;
+	var modelUrl = url || self.scheme.url;
 	var promise = ajax.makePromise(modelUrl).then(function (resolve) {
 		self.update(resolve);
 		return resolve;
@@ -31,7 +37,7 @@ Model.prototype.update = function (data) {
 
 	var parsedData = JSON.parse(data);
 	for(var item in parsedData) {
-		this.data[item] = parsedData[item];
+		this.scheme[item] = parsedData[item];
 	}
 
 	this.emit('updated', this);

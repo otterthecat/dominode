@@ -1,5 +1,4 @@
 var Model = require('./model');
-var View = require('./view');
 
 var Page = function () {
 	'use strict';
@@ -14,7 +13,6 @@ var applyAttributes = function (el, obj) {
 			el.setAttribute(item, obj[item]);
 		}
 	}
-
 	return el;
 };
 
@@ -22,26 +20,25 @@ var buildViewModel = function (model) {
 	'use strict';
 
 	var self = this;
-	var obj = model.data || model;
-	var element = document.createElement(obj.element);
-	if(obj.attributes) {
-		applyAttributes(element, obj.attributes);
+	var element = document.createElement(model.scheme.element);
+	if(model.scheme.attributes) {
+		applyAttributes(element, model.scheme.attributes);
 	}
 
-	element.innerHTML = obj.content;
-	if(obj.event){
-		element.addEventListener(obj.event, function (ev) {
-			obj.callback.call(model, ev, self);
+	element.innerHTML = model.scheme.content;
+	if(model.scheme.event){
+		element.addEventListener(model.scheme.event, function (ev) {
+			model.scheme.callback.call(model, ev, self);
 		});
 	}
 
-	obj.element = element;
-
-	self.elements[obj.name] = obj;
+	// apply dom node to scheme
+	model.scheme.element = element;
+	self.elements[model.scheme.name] = model;
 
 	model.on('updated', function () {
-		self.refresh(model.data.name);
-	});
+		this.refresh(model.scheme.name);
+	}.bind(model));
 };
 
 Page.prototype.register = function (list) {
@@ -75,6 +72,29 @@ Page.prototype.destroy = function (str) {
 	return this;
 }
 
+Page.prototype.append = function (el, target) {
+	'use strict';
 
+	var targetNode = target || document.querySelector('body');
+	targetNode.appendChild(this.getElement(el).scheme.element);
+	return this;
+};
+
+Page.prototype.prepend = function (el, target) {
+	'use strict';
+
+	var targetNode = target || document.querySelector('body');
+	targetNode.insertBefore(this.getElement(el).scheme.element, targetNode.firstChild);
+	return this;
+};
+
+Page.prototype.bond = function (base, target) {
+	'use strict';
+
+	var self = this;
+	self.getElement(base).scheme.element.addEventListener(self.getElement(target).scheme.event, function (ev) {
+		self.getElement(target).scheme.callback.call(self.getElement(target), ev, self);
+	});
+}
 
 module.exports = new Page();

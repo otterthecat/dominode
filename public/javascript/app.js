@@ -1,21 +1,12 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/home/d/projects/github/dominode/client/app.js":[function(require,module,exports){
-// var Model = require('./dominode/model');
-// var View = require('./dominode/view');
 var page = require('./dominode/page');
 var headlineSchema = require('./schemas/headline');
 var footerSchema = require('./schemas/footer');
 
-// var view = new View();
-// var headline = new Model(headlineSchema);
-// var footer = new Model(footerSchema);
-
-// view.generate([headline, footer])
-// 	.prepend('headline', document.querySelector('body'))
-// 	.append('footer')
-// 	.bond(footer, headline); // footer takes on same events as headline. Triggers same callback (i.e update the headline)
-
-page.register([headlineSchema, footerSchema]);
-console.log('page', page);
+page.register([headlineSchema, footerSchema])
+	.prepend('headline')
+	.append('footer')
+	.bond('footer', 'headline');
 
 },{"./dominode/page":"/home/d/projects/github/dominode/client/dominode/page.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/model.js":[function(require,module,exports){
 var util = require('util');
@@ -26,16 +17,22 @@ var Model = function (obj) {
 	'use strict';
 
 	events.EventEmitter.call(this);
-	this.data = obj;
+	this.scheme = obj;
 };
 
 util.inherits(Model, events.EventEmitter);
+
+Model.prototype.refresh = function () {
+		'use strict';
+		this.scheme.element.innerHTML = this.scheme.content;
+		return this;
+	},
 
 Model.prototype.fetch = function (url) {
 	'use strict';
 
 	var self = this;
-	var modelUrl = url || self.data.url;
+	var modelUrl = url || self.scheme.url;
 	var promise = ajax.makePromise(modelUrl).then(function (resolve) {
 		self.update(resolve);
 		return resolve;
@@ -51,7 +48,7 @@ Model.prototype.update = function (data) {
 
 	var parsedData = JSON.parse(data);
 	for(var item in parsedData) {
-		this.data[item] = parsedData[item];
+		this.scheme[item] = parsedData[item];
 	}
 
 	this.emit('updated', this);
@@ -61,7 +58,6 @@ module.exports = Model;
 
 },{"../helpers/ajax":"/home/d/projects/github/dominode/client/helpers/ajax.js","events":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","util":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/util/util.js"}],"/home/d/projects/github/dominode/client/dominode/page.js":[function(require,module,exports){
 var Model = require('./model');
-var View = require('./view');
 
 var Page = function () {
 	'use strict';
@@ -76,7 +72,6 @@ var applyAttributes = function (el, obj) {
 			el.setAttribute(item, obj[item]);
 		}
 	}
-
 	return el;
 };
 
@@ -84,26 +79,25 @@ var buildViewModel = function (model) {
 	'use strict';
 
 	var self = this;
-	var obj = model.data || model;
-	var element = document.createElement(obj.element);
-	if(obj.attributes) {
-		applyAttributes(element, obj.attributes);
+	var element = document.createElement(model.scheme.element);
+	if(model.scheme.attributes) {
+		applyAttributes(element, model.scheme.attributes);
 	}
 
-	element.innerHTML = obj.content;
-	if(obj.event){
-		element.addEventListener(obj.event, function (ev) {
-			obj.callback.call(model, ev, self);
+	element.innerHTML = model.scheme.content;
+	if(model.scheme.event){
+		element.addEventListener(model.scheme.event, function (ev) {
+			model.scheme.callback.call(model, ev, self);
 		});
 	}
 
-	obj.element = element;
-
-	self.elements[obj.name] = obj;
+	// apply dom node to scheme
+	model.scheme.element = element;
+	self.elements[model.scheme.name] = model;
 
 	model.on('updated', function () {
-		self.refresh(model.data.name);
-	});
+		this.refresh(model.scheme.name);
+	}.bind(model));
 };
 
 Page.prototype.register = function (list) {
@@ -137,106 +131,34 @@ Page.prototype.destroy = function (str) {
 	return this;
 }
 
-
-
-module.exports = new Page();
-
-},{"./model":"/home/d/projects/github/dominode/client/dominode/model.js","./view":"/home/d/projects/github/dominode/client/dominode/view.js"}],"/home/d/projects/github/dominode/client/dominode/view.js":[function(require,module,exports){
-var applyAttributes = function (el, obj) {
+Page.prototype.append = function (el, target) {
 	'use strict';
 
-	if(typeof obj !== 'undefined') {
-		for(var item in obj) {
-			el.setAttribute(item, obj[item]);
-		}
-	}
-
-	return el;
+	var targetNode = target || document.querySelector('body');
+	targetNode.appendChild(this.getElement(el).scheme.element);
+	return this;
 };
 
-var View = function () {
+Page.prototype.prepend = function (el, target) {
 	'use strict';
-	this.elements = {};
+
+	var targetNode = target || document.querySelector('body');
+	targetNode.insertBefore(this.getElement(el).scheme.element, targetNode.firstChild);
+	return this;
 };
 
-var buildModelView = function (model) {
+Page.prototype.bond = function (base, target) {
 	'use strict';
 
 	var self = this;
-	var obj = model.data || model;
-	var element = document.createElement(obj.element);
-	if(obj.attributes) {
-		applyAttributes(element, obj.attributes);
-	}
-
-	element.innerHTML = obj.content;
-	if(obj.event){
-		element.addEventListener(obj.event, function (ev) {
-			obj.callback.call(model, ev, self);
-		});
-	}
-
-	obj.element = element;
-
-	self.elements[obj.name] = obj;
-
-	model.on('updated', function () {
-		self.refresh(model.data.name);
+	self.getElement(base).scheme.element.addEventListener(self.getElement(target).scheme.event, function (ev) {
+		self.getElement(target).scheme.callback.call(self.getElement(target), ev, self);
 	});
-};
+}
 
-View.prototype = {
-	generate : function (models) {
-		'use strict';
+module.exports = new Page();
 
-		models.forEach(buildModelView.bind(this));
-		return this;
-	},
-
-	append : function (el, target) {
-		'use strict';
-
-		var targetNode = target || document.querySelector('body');
-		targetNode.appendChild(this.getElement(el).element);
-		return this;
-	},
-
-	prepend : function (el, target) {
-		'use strict';
-
-		var targetNode = target || document.querySelector('body');
-		targetNode.insertBefore(this.getElement(el).element, targetNode.firstChild);
-		return this;
-	},
-
-	refresh : function (el) {
-		'use strict';
-		var item = this.getElement(el);
-		item.element.innerHTML = item.content;
-		return this;
-	},
-
-	getElement : function (str) {
-		'use strict';
-		return this.elements[str];
-	},
-
-	listElements : function () {
-		'use strict';
-		return this.elements;
-	},
-
-	bond: function (base, target) {
-		var self = this;
-		base.data.element.addEventListener(target.data.event, function (ev) {
-			target.data.callback.call(target, ev, self);
-		});
-	}
-};
-
-module.exports = View;
-
-},{}],"/home/d/projects/github/dominode/client/helpers/ajax.js":[function(require,module,exports){
+},{"./model":"/home/d/projects/github/dominode/client/dominode/model.js"}],"/home/d/projects/github/dominode/client/helpers/ajax.js":[function(require,module,exports){
 exports.makePromise = function (url) {
 	'use strict';
 
