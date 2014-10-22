@@ -1,14 +1,41 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/home/d/projects/github/dominode/client/app.js":[function(require,module,exports){
 var page = require('./dominode/page');
+var layout = require('./dominode/layout');
+var hcf = require('./layouts/header-content-footer');
 var headlineSchema = require('./schemas/headline');
 var footerSchema = require('./schemas/footer');
-
+layout.generate(hcf);
 page.register([headlineSchema, footerSchema])
 	.prepend('headline')
 	.append('footer')
 	.bond('footer', 'headline');
 
-},{"./dominode/page":"/home/d/projects/github/dominode/client/dominode/page.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/model.js":[function(require,module,exports){
+},{"./dominode/layout":"/home/d/projects/github/dominode/client/dominode/layout.js","./dominode/page":"/home/d/projects/github/dominode/client/dominode/page.js","./layouts/header-content-footer":"/home/d/projects/github/dominode/client/layouts/header-content-footer.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/layout.js":[function(require,module,exports){
+var Layout = function () {
+	'use strict';
+};
+
+
+Layout.prototype.generate = function (patterns) {
+	'use strict';
+
+	patterns.forEach(function (item) {
+		var section = item[Object.getOwnPropertyNames(item)[0]];
+		var el = document.createElement(section.element);
+		if(section.attributes) {
+			for(var attribute in section.attributes){
+				el.setAttribute(attribute, section.attributes[attribute]);
+			}
+		}
+		console.log('el', el);
+		document.querySelector('body').appendChild(el);
+	});
+
+};
+
+module.exports = new Layout();
+
+},{}],"/home/d/projects/github/dominode/client/dominode/model.js":[function(require,module,exports){
 var util = require('util');
 var events = require('events');
 var ajax = require('../helpers/ajax');
@@ -191,12 +218,40 @@ exports.makePromise = function (url) {
 	});
 };
 
+},{}],"/home/d/projects/github/dominode/client/layouts/header-content-footer.js":[function(require,module,exports){
+module.exports = [{
+		header: {
+			element: 'div',
+			attributes: {
+				'class': 'main-header',
+				'id': 'main-header'
+			}
+		}
+	},
+	{
+		content: {
+			element: 'div',
+			attributes: {
+				'id': 'main-content'
+			}
+		}
+	},
+	{
+		footer: {
+			element: 'div',
+			attributes: {
+				'class': 'footer',
+				'id': 'main-footer'
+			}
+		}
+	}];
+
 },{}],"/home/d/projects/github/dominode/client/schemas/footer.js":[function(require,module,exports){
 module.exports = {
 	name : 'footer',
 	element : 'div',
 	attributes : {
-		'class' : 'main-footer'
+		'class' : 'footer-info'
 	},
 	content : 'this is the footer'
 };

@@ -2,7 +2,7 @@ module.exports = {
 	name : 'footer',
 	element : 'div',
 	attributes : {
-		'class' : 'main-footer'
+		'class' : 'footer-info'
 	},
 	content : 'this is the footer'
 };
