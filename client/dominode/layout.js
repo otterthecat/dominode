@@ -22,7 +22,6 @@ Layout.prototype.generate = function (patterns) {
 		}
 		body.insertBefore(el, body.firstChild);
 	});
-
 };
 
 module.exports = new Layout();

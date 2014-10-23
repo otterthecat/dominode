@@ -6,6 +6,6 @@ var footerSchema = require('./schemas/footer');
 
 layout.generate(hcf);
 page.register([headlineSchema, footerSchema])
-	.prepend('headline')
-	.append('footer')
+	.prepend('headline', document.querySelector('#main-header'))
+	.append('footer', document.querySelector('#main-footer'))
 	.bond('footer', 'headline');

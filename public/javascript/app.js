@@ -7,8 +7,8 @@ var footerSchema = require('./schemas/footer');
 
 layout.generate(hcf);
 page.register([headlineSchema, footerSchema])
-	.prepend('headline')
-	.append('footer')
+	.prepend('headline', document.querySelector('#main-header'))
+	.append('footer', document.querySelector('#main-footer'))
 	.bond('footer', 'headline');
 
 },{"./dominode/layout":"/home/d/projects/github/dominode/client/dominode/layout.js","./dominode/page":"/home/d/projects/github/dominode/client/dominode/page.js","./layouts/header-content-footer":"/home/d/projects/github/dominode/client/layouts/header-content-footer.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/layout.js":[function(require,module,exports){
@@ -36,7 +36,6 @@ Layout.prototype.generate = function (patterns) {
 		}
 		body.insertBefore(el, body.firstChild);
 	});
-
 };
 
 module.exports = new Layout();
