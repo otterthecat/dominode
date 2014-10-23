@@ -4,6 +4,7 @@ var layout = require('./dominode/layout');
 var hcf = require('./layouts/header-content-footer');
 var headlineSchema = require('./schemas/headline');
 var footerSchema = require('./schemas/footer');
+
 layout.generate(hcf);
 page.register([headlineSchema, footerSchema])
 	.prepend('headline')
@@ -13,22 +14,27 @@ page.register([headlineSchema, footerSchema])
 },{"./dominode/layout":"/home/d/projects/github/dominode/client/dominode/layout.js","./dominode/page":"/home/d/projects/github/dominode/client/dominode/page.js","./layouts/header-content-footer":"/home/d/projects/github/dominode/client/layouts/header-content-footer.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/layout.js":[function(require,module,exports){
 var Layout = function () {
 	'use strict';
+	this.sections = {};
 };
-
 
 Layout.prototype.generate = function (patterns) {
 	'use strict';
 
-	patterns.forEach(function (item) {
-		var section = item[Object.getOwnPropertyNames(item)[0]];
+	var self = this;
+	var body = document.querySelector('body');
+
+	patterns.reverse().forEach(function (item) {
+		var key = Object.getOwnPropertyNames(item)[0];
+		var section = item[key];
+		self.sections[key] = item[key];
+
 		var el = document.createElement(section.element);
 		if(section.attributes) {
 			for(var attribute in section.attributes){
 				el.setAttribute(attribute, section.attributes[attribute]);
 			}
 		}
-		console.log('el', el);
-		document.querySelector('body').appendChild(el);
+		body.insertBefore(el, body.firstChild);
 	});
 
 };
