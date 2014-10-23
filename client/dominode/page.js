@@ -21,9 +21,7 @@ var buildViewModel = function (model) {
 
 	var self = this;
 	var element = document.createElement(model.scheme.element);
-	if(model.scheme.attributes) {
-		applyAttributes(element, model.scheme.attributes);
-	}
+	applyAttributes(element, model.scheme.attributes);
 
 	element.innerHTML = model.scheme.content;
 	if(model.scheme.event){
