@@ -8,7 +8,7 @@ module.exports = {
 	content : '<h1>Hello World</h1>',
 	url : '/github/dominode/public/javascript/data.json',
 	event : 'click',
-	// callback takes (event, scope)
+	// callback takes (event, page)
 	// 'this' is bound to model
 	callback : function () {
 		'use strict';

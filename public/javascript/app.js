@@ -3,15 +3,17 @@ var page = require('./dominode/page');
 var layout = require('./dominode/layout');
 var hcf = require('./layouts/header-content-footer');
 var headlineSchema = require('./schemas/headline');
+var link = require('./schemas/link');
 var footerSchema = require('./schemas/footer');
 
 layout.generate(hcf);
-page.register([headlineSchema, footerSchema])
+page.register([headlineSchema, link, footerSchema])
 	.prepend('headline', document.querySelector('#main-header'))
+	.append('link', document.querySelector('#main-content'))
 	.append('footer', document.querySelector('#main-footer'))
 	.bond('footer', 'headline');
 
-},{"./dominode/layout":"/home/d/projects/github/dominode/client/dominode/layout.js","./dominode/page":"/home/d/projects/github/dominode/client/dominode/page.js","./layouts/header-content-footer":"/home/d/projects/github/dominode/client/layouts/header-content-footer.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js"}],"/home/d/projects/github/dominode/client/dominode/layout.js":[function(require,module,exports){
+},{"./dominode/layout":"/home/d/projects/github/dominode/client/dominode/layout.js","./dominode/page":"/home/d/projects/github/dominode/client/dominode/page.js","./layouts/header-content-footer":"/home/d/projects/github/dominode/client/layouts/header-content-footer.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js","./schemas/link":"/home/d/projects/github/dominode/client/schemas/link.js"}],"/home/d/projects/github/dominode/client/dominode/layout.js":[function(require,module,exports){
 var Layout = function () {
 	'use strict';
 	this.sections = {};
@@ -188,7 +190,28 @@ Page.prototype.bond = function (base, target) {
 
 module.exports = new Page();
 
-},{"./model":"/home/d/projects/github/dominode/client/dominode/model.js"}],"/home/d/projects/github/dominode/client/helpers/ajax.js":[function(require,module,exports){
+},{"./model":"/home/d/projects/github/dominode/client/dominode/model.js"}],"/home/d/projects/github/dominode/client/dominode/router.js":[function(require,module,exports){
+var events = require('events');
+var util = require('util');
+var pushpop = require('../helpers/pushpop')(window);
+
+var Router = function (routes) {
+	'use strict';
+	this.state = pushpop;
+	events.EventEmitter.call(this);
+};
+
+util.inherits(Router, events.EventEmitter);
+
+Router.prototype.directTo = function (path, data) {
+	'use strict';
+	this.state.push(path, data);
+	this.emit(path, data);
+};
+
+module.exports = new Router();
+
+},{"../helpers/pushpop":"/home/d/projects/github/dominode/client/helpers/pushpop.js","events":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","util":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/util/util.js"}],"/home/d/projects/github/dominode/client/helpers/ajax.js":[function(require,module,exports){
 exports.makePromise = function (url) {
 	'use strict';
 
@@ -219,6 +242,63 @@ exports.makePromise = function (url) {
 
 		request.send();
 	});
+};
+
+},{}],"/home/d/projects/github/dominode/client/helpers/pushpop.js":[function(require,module,exports){
+var Pushpop = function  (win) {
+	'use strict';
+
+	this.window = win;
+	this.history = this.window.history;
+	this.hasPopState = typeof this.window.onpopstate !== 'undefined';
+
+	this.checkCompatability = function (action, url, obj) {
+
+		if(this.hasPopState) {
+			this.history[action + 'State']({
+				'url': url,
+				'data': obj
+			}, '', url);
+		}
+		else {
+			this.window.location = url;
+		}
+	};
+};
+
+Pushpop.prototype.push = function (url, obj) {
+	'use strict';
+	this.checkCompatability('push', url, obj);
+};
+
+Pushpop.prototype.replace = function (url, obj) {
+	'use strict';
+	this.checkCompatability('replace', url, obj);
+};
+
+Pushpop.prototype.getState = function (fn) {
+	'use strict';
+
+	if(!this.hasPopState) {
+		return false;
+	}
+
+	return fn ? fn(this.history.state) : this.history.state;
+};
+
+Pushpop.prototype.watchState = function (fn) {
+	'use strict';
+
+	if(!this.hasPopState){
+		return false;
+	}
+
+	this.window.onpopstate = fn;
+};
+
+module.exports = function (win) {
+	'use strict';
+	return new Pushpop(win);
 };
 
 },{}],"/home/d/projects/github/dominode/client/layouts/header-content-footer.js":[function(require,module,exports){
@@ -270,7 +350,7 @@ module.exports = {
 	content : '<h1>Hello World</h1>',
 	url : '/github/dominode/public/javascript/data.json',
 	event : 'click',
-	// callback takes (event, scope)
+	// callback takes (event, page)
 	// 'this' is bound to model
 	callback : function () {
 		'use strict';
@@ -278,7 +358,28 @@ module.exports = {
 	}
 };
 
-},{}],"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js":[function(require,module,exports){
+},{}],"/home/d/projects/github/dominode/client/schemas/link.js":[function(require,module,exports){
+var router = require('../dominode/router');
+
+module.exports = {
+	name: 'link',
+	element: 'a',
+	attributes: {
+		'href': 'new/path'
+	},
+	content: 'click me',
+	event: 'click',
+	callback: function (ev, page){
+		'use strict';
+		ev.preventDefault();
+
+		var data = {content: 'new content'};
+		router.directTo(this.scheme.attributes.href, data);
+		this.update(JSON.stringify(data));
+	}
+};
+
+},{"../dominode/router":"/home/d/projects/github/dominode/client/dominode/router.js"}],"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js":[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -614,6 +715,8 @@ var process = module.exports = {};
 process.nextTick = (function () {
     var canSetImmediate = typeof window !== 'undefined'
     && window.setImmediate;
+    var canMutationObserver = typeof window !== 'undefined'
+    && window.MutationObserver;
     var canPost = typeof window !== 'undefined'
     && window.postMessage && window.addEventListener
     ;
@@ -622,8 +725,29 @@ process.nextTick = (function () {
         return function (f) { return window.setImmediate(f) };
     }
 
+    var queue = [];
+
+    if (canMutationObserver) {
+        var hiddenDiv = document.createElement("div");
+        var observer = new MutationObserver(function () {
+            var queueList = queue.slice();
+            queue.length = 0;
+            queueList.forEach(function (fn) {
+                fn();
+            });
+        });
+
+        observer.observe(hiddenDiv, { attributes: true });
+
+        return function nextTick(fn) {
+            if (!queue.length) {
+                hiddenDiv.setAttribute('yes', 'no');
+            }
+            queue.push(fn);
+        };
+    }
+
     if (canPost) {
-        var queue = [];
         window.addEventListener('message', function (ev) {
             var source = ev.source;
             if ((source === window || source === null) && ev.data === 'process-tick') {
@@ -663,7 +787,7 @@ process.emit = noop;
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
-}
+};
 
 // TODO(shtylman)
 process.cwd = function () { return '/' };
