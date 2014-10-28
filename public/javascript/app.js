@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/home/d/projects/github/dominode/client/app.js":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var page = require('./dominode/page');
 var layout = require('./dominode/layout');
 var hcf = require('./layouts/header-content-footer');
@@ -13,7 +13,7 @@ page.register([headlineSchema, link, footerSchema])
 	.append('footer', document.querySelector('#main-footer'))
 	.bond('footer', 'headline');
 
-},{"./dominode/layout":"/home/d/projects/github/dominode/client/dominode/layout.js","./dominode/page":"/home/d/projects/github/dominode/client/dominode/page.js","./layouts/header-content-footer":"/home/d/projects/github/dominode/client/layouts/header-content-footer.js","./schemas/footer":"/home/d/projects/github/dominode/client/schemas/footer.js","./schemas/headline":"/home/d/projects/github/dominode/client/schemas/headline.js","./schemas/link":"/home/d/projects/github/dominode/client/schemas/link.js"}],"/home/d/projects/github/dominode/client/dominode/layout.js":[function(require,module,exports){
+},{"./dominode/layout":2,"./dominode/page":4,"./layouts/header-content-footer":8,"./schemas/footer":9,"./schemas/headline":10,"./schemas/link":11}],2:[function(require,module,exports){
 var Layout = function () {
 	'use strict';
 	this.sections = {};
@@ -42,7 +42,7 @@ Layout.prototype.generate = function (patterns) {
 
 module.exports = new Layout();
 
-},{}],"/home/d/projects/github/dominode/client/dominode/model.js":[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 var util = require('util');
 var events = require('events');
 var ajax = require('../helpers/ajax');
@@ -90,7 +90,7 @@ Model.prototype.update = function (data) {
 
 module.exports = Model;
 
-},{"../helpers/ajax":"/home/d/projects/github/dominode/client/helpers/ajax.js","events":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","util":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/util/util.js"}],"/home/d/projects/github/dominode/client/dominode/page.js":[function(require,module,exports){
+},{"../helpers/ajax":6,"events":12,"util":16}],4:[function(require,module,exports){
 var Model = require('./model');
 
 var Page = function () {
@@ -186,11 +186,12 @@ Page.prototype.bond = function (base, target) {
 	self.getElement(base).scheme.element.addEventListener(self.getElement(target).scheme.event, function (ev) {
 		self.getElement(target).scheme.callback.call(self.getElement(target), ev, self);
 	});
+	return self;
 }
 
 module.exports = new Page();
 
-},{"./model":"/home/d/projects/github/dominode/client/dominode/model.js"}],"/home/d/projects/github/dominode/client/dominode/router.js":[function(require,module,exports){
+},{"./model":3}],5:[function(require,module,exports){
 var events = require('events');
 var util = require('util');
 var pushpop = require('../helpers/pushpop')(window);
@@ -211,7 +212,7 @@ Router.prototype.directTo = function (path, data) {
 
 module.exports = new Router();
 
-},{"../helpers/pushpop":"/home/d/projects/github/dominode/client/helpers/pushpop.js","events":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","util":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/util/util.js"}],"/home/d/projects/github/dominode/client/helpers/ajax.js":[function(require,module,exports){
+},{"../helpers/pushpop":7,"events":12,"util":16}],6:[function(require,module,exports){
 exports.makePromise = function (url) {
 	'use strict';
 
@@ -244,7 +245,7 @@ exports.makePromise = function (url) {
 	});
 };
 
-},{}],"/home/d/projects/github/dominode/client/helpers/pushpop.js":[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var Pushpop = function  (win) {
 	'use strict';
 
@@ -301,7 +302,7 @@ module.exports = function (win) {
 	return new Pushpop(win);
 };
 
-},{}],"/home/d/projects/github/dominode/client/layouts/header-content-footer.js":[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 module.exports = [{
 		header: {
 			element: 'div',
@@ -329,7 +330,7 @@ module.exports = [{
 		}
 	}];
 
-},{}],"/home/d/projects/github/dominode/client/schemas/footer.js":[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 module.exports = {
 	name : 'footer',
 	element : 'div',
@@ -339,7 +340,7 @@ module.exports = {
 	content : 'this is the footer'
 };
 
-},{}],"/home/d/projects/github/dominode/client/schemas/headline.js":[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = {
 	name : 'headline',
 	element : 'div',
@@ -358,7 +359,7 @@ module.exports = {
 	}
 };
 
-},{}],"/home/d/projects/github/dominode/client/schemas/link.js":[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var router = require('../dominode/router');
 
 module.exports = {
@@ -379,7 +380,7 @@ module.exports = {
 	}
 };
 
-},{"../dominode/router":"/home/d/projects/github/dominode/client/dominode/router.js"}],"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js":[function(require,module,exports){
+},{"../dominode/router":5}],12:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -682,7 +683,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js":[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -707,7 +708,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -795,14 +796,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/util/support/isBufferBrowser.js":[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/util/util.js":[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -1392,4 +1393,4 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/util/support/isBufferBrowser.js","_process":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","inherits":"/usr/lib/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js"}]},{},["/home/d/projects/github/dominode/client/app.js"]);
+},{"./support/isBuffer":15,"_process":14,"inherits":13}]},{},[1]);

@@ -93,6 +93,7 @@ Page.prototype.bond = function (base, target) {
 	self.getElement(base).scheme.element.addEventListener(self.getElement(target).scheme.event, function (ev) {
 		self.getElement(target).scheme.callback.call(self.getElement(target), ev, self);
 	});
+	return self;
 }
 
 module.exports = new Page();
