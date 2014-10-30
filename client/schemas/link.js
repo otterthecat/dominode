@@ -11,7 +11,6 @@ module.exports = {
 	callback: function (ev, page){
 		'use strict';
 		ev.preventDefault();
-
 		var data = {content: 'new content'};
 		router.directTo(this.scheme.attributes.href, data);
 		this.update(JSON.stringify(data));

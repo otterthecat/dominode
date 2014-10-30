@@ -10,4 +10,4 @@ page.register([headlineSchema, link, footerSchema])
 	.prepend('headline', document.querySelector('#main-header'))
 	.append('link', document.querySelector('#main-content'))
 	.append('footer', document.querySelector('#main-footer'))
-	.bond('footer', 'headline');
+	.bond('link', 'headline', 'function');

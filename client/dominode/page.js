@@ -86,13 +86,29 @@ Page.prototype.prepend = function (el, target) {
 	return this;
 };
 
-Page.prototype.bond = function (base, target) {
+Page.prototype.bond = function (base, target, type) {
 	'use strict';
 
 	var self = this;
-	self.getElement(base).scheme.element.addEventListener(self.getElement(target).scheme.event, function (ev) {
-		self.getElement(target).scheme.callback.call(self.getElement(target), ev, self);
-	});
+	if(type === 'function'){
+
+		self.getElement(target).scheme.callback.bind(self.getElement(base));
+		self.getElement(base).scheme.element.addEventListener(self.getElement(base).scheme.event, function(ev){
+
+			self.getElement(base).scheme.callback.call(self.getElement(target), ev, self);
+		});
+		console.log(self.getElement(base).scheme.element);
+	}
+	else if (type === 'event') {
+		self.getElement(base).scheme.element.addEventListener(self.getElement(target).scheme.event, function (ev) {
+			self.getElement(target).scheme.callback.call(self.getElement(target), ev, self);
+		});
+	}
+	else {
+		self.getElement(base).scheme.element.addEventListener(self.getElement(target).scheme.event, function (ev) {
+			self.getElement(target).scheme.callback.call(self.getElement(target), ev, self);
+		});
+	}
 	return self;
 }
 
