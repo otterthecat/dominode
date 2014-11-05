@@ -1,8 +1,10 @@
 var Model = require('./model');
+var layout = require('./layout');
 
-var Page = function () {
+var Page = function (options) {
 	'use strict';
 	this.elements = {};
+	this.layout = layout;
 };
 
 var applyAttributes = function (el, obj) {
@@ -49,6 +51,11 @@ Page.prototype.register = function (list) {
 	}.bind(self));
 
 	return self;
+};
+
+Page.prototype.useLayout = function (obj) {
+	this.layout.generate(obj);
+	return this;
 };
 
 Page.prototype.redirect = function (str) {
